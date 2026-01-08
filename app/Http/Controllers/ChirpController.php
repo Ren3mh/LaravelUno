@@ -29,40 +29,48 @@ class ChirpController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
-        //
+        // Validate the request
+        $validated = $request->validate([
+            'message' => 'required|string|max:255',
+        ]);
+
+        // Create the chirp (no user for now - we'll add auth later)
+        \App\Models\Chirp::create([
+            'message' => $validated['message'],
+            'user_id' => null, // We'll add authentication in lesson 11
+        ]);
+
+        // Redirect back to the feed
+        return redirect('/')->with('success', 'Chirp created!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    
+    public function edit(Chirp $chirp)
     {
-        //
+        // We'll add authorization in lesson 11
+        return view('chirps.edit', compact('chirp'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Chirp $chirp)
     {
-        //
+        // Validate
+        $validated = $request->validate([
+            'message' => 'required|string|max:255',
+        ]);
+
+        // Update
+        $chirp->update($validated);
+
+        return redirect('/')->with('success', 'Chirp updated!');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Chirp $chirp)
     {
-        //
-    }
+        $chirp->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect('/')->with('success', 'Chirp deleted!');
     }
 }
